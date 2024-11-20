@@ -4,27 +4,37 @@ package com.deout.task;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 public class IntIteratorTest {
 
     @Test
     public void testForeach() {
-        int[] arr = {1, 2, 3, 4, 5};
+        int[] arr = createArray(10);
         IntIterable intIterable = new IntIterable(arr);
-        Integer i = 0;
+        int i = 0;
         for (Integer el : intIterable) {
-            assertEquals(i + " element doesn't match", Integer.valueOf(arr[i]), el);
+            assertEquals("Element at index " + i + " does not match", Integer.valueOf(arr[i]), el);
             i++;
         }
-        assertEquals("Didn't went throw array", i, Integer.valueOf(arr.length));
+        assertEquals("Did not iterate through the entire array", arr.length, i);
     }
 
     @Test
     public void testBlankForeach() {
         int[] arr = new int[0];
-        for (Integer el : new IntIterable(arr)) {
-            assertFalse("Shouldn't come here", true);
+        for (Integer ignored : new IntIterable(arr)) {
+            fail("The loop should not be executed for an empty array");
         }
     }
+
+    public int[] createArray(int size) {
+        int[] arr = new int[size];
+        for (int i = 0; i < size; i++) {
+            arr[i] = i;
+        }
+        return arr;
+    }
 }
+
+

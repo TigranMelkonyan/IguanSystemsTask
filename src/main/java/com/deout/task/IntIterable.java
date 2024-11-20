@@ -1,57 +1,52 @@
 package com.deout.task;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public class IntIterable implements Iterable<Integer> {
-    private int[] backed;
-    private int index = 0;
 
-    public IntIterable(int[] backed) {
-        this.backed = backed;
+    private final List<Integer> backed;
+
+    public IntIterable(int[] array) {
+        if (array == null) {
+            throw new NullPointerException("Array cannot be null");
+        }
+        this.backed = new ArrayList<>();
+        for (int val : array) {
+            backed.add(val);
+        }
     }
 
+    @Override
     public Iterator<Integer> iterator() {
         return new IntIterator();
     }
 
     private class IntIterator implements Iterator<Integer> {
+        private int currentIndex = -1;
+
+        @Override
         public boolean hasNext() {
-            assertNotNull();
-            return index < backed.length;
+            return currentIndex + 1 < backed.size();
         }
 
+        @Override
         public Integer next() {
-            assertNotNull();
-            assertIndexNotOutOfRange();
-            return backed[index++];
-        }
-
-        public void remove() {
-            int[] arr = new int[backed.length - 1];
-            assertNotNull();
-            assertIndexNotOutOfRange();
-            for (int i = 0; i < backed.length; i++) {
-                if (index - 1 == i) {
-                    for (int j = i; j < backed.length - 1; j++) {
-                        arr[j] = backed[j + 1];
-                    }
-                    break;
-                }
-                arr[i] = backed[i];
+            if (!hasNext()) {
+                throw new NoSuchElementException("No more elements to iterate");
             }
-            backed = arr;
+            return backed.get(++currentIndex);
         }
-    }
 
-    private void assertNotNull() {
-        if (backed == null) {
-            throw new NullPointerException("Array cant be null");
-        }
-    }
-
-    private void assertIndexNotOutOfRange() {
-        if (index < 0 || index >= backed.length) {
-            throw new IllegalStateException("Could not remove from array");
+        @Override
+        public void remove() {
+            if (currentIndex < 0 || currentIndex >= backed.size()) {
+                throw new IllegalStateException("Remove operation not valid");
+            }
+            backed.remove(currentIndex);
+            currentIndex--;
         }
     }
 }
